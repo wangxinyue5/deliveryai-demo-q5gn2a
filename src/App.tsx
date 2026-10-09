@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ClipboardList, ConciergeBell, LayoutDashboard, Menu as MenuIcon, ShoppingBasket } from 'lucide-react'
 import { HomeView } from '@/components/HomeView'
 import { WelcomeView } from '@/components/WelcomeView'
+import { CalculatorView } from '@/components/CalculatorView'
 import { CartPanel } from '@/components/CartPanel'
 import { CheckoutView } from '@/components/CheckoutView'
 import { DemoConsole } from '@/components/DemoConsole'
@@ -38,7 +39,10 @@ function createInitialState(): AppState {
   }
 
   // 深链接：直接以 #/welcome 等地址打开时，先绑定示例桌台再进入对应视图；
-  // home 无需桌台，其余流程视图（welcome/menu/order/checkout）需要桌台上下文。
+  // home 与 calculator 无需桌台，其余流程视图（welcome/menu/order/checkout）需要桌台上下文。
+  if (requestedView === 'calculator') {
+    return { ...initialState, view: 'calculator' }
+  }
   if (requestedView && requestedView !== 'home') {
     return { ...initialState, table: 'A08', view: requestedView }
   }
@@ -57,7 +61,7 @@ export default function App() {
   const waitingServices = state.services.filter((service) => service.status === 'waiting').length
 
   // 视图 ↔ URL hash 双向同步；未绑定桌台时只有 home 可达，其余地址回落到 home
-  const canView = useCallback((view: ViewName) => view === 'home' || !!state.table, [state.table])
+  const canView = useCallback((view: ViewName) => view === 'home' || view === 'calculator' || !!state.table, [state.table])
   const navigate = useCallback((view: ViewName) => dispatch({ type: 'SET_VIEW', view }), [])
   useViewRoute(state.view, { onNavigate: navigate, canView })
 
@@ -86,8 +90,12 @@ export default function App() {
     dispatch({ type: 'SET_MESSAGE', message: elderly ? '已切换为常规模式' : '已切换为老人模式' })
   }
 
+  if (state.view === 'calculator') {
+    return <CalculatorView onBack={() => dispatch({ type: 'SET_VIEW', view: 'home' })} />
+  }
+
   if (state.view === 'home' || !state.table) {
-    return <HomeView onBind={(table) => dispatch({ type: 'BIND_TABLE', table })} />
+    return <HomeView onBind={(table) => dispatch({ type: 'BIND_TABLE', table })} onOpenCalculator={() => dispatch({ type: 'SET_VIEW', view: 'calculator' })} />
   }
 
   if (state.view === 'welcome') {
