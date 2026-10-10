@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Check, ChevronRight, MapPin, QrCode, Sparkles, Users } from 'lucide-react'
+import { Calculator, Check, ChevronRight, MapPin, QrCode, Sparkles, Users } from 'lucide-react'
 import hotpot from '@/assets/hotpot.jpg'
 import { Button } from '@/components/ui/button'
 
@@ -10,9 +10,12 @@ const tableOptions = [
   { code: 'D03', areaKey: 'bind.area.window', seats: 6 },
 ]
 
-interface HomeViewProps { onBind: (table: string) => void }
+interface HomeViewProps {
+  onBind: (table: string) => void
+  onOpenCalculator: () => void
+}
 
-export function HomeView({ onBind }: HomeViewProps) {
+export function HomeView({ onBind, onOpenCalculator }: HomeViewProps) {
   const { t } = useTranslation()
   return (
     <main className="relative min-h-screen overflow-hidden bg-rice-100 paper-noise">
@@ -59,6 +62,20 @@ export function HomeView({ onBind }: HomeViewProps) {
             ))}
           </div>
           <Button onClick={() => onBind('A08')} className="mt-4 w-full"><MapPin size={17} />{t('bind.quick_enter')}</Button>
+
+          <button
+            type="button"
+            onClick={onOpenCalculator}
+            data-testid="home-calculator-entry"
+            className="mt-4 flex w-full items-center gap-3 rounded-2xl border border-chili-500/20 bg-chili-50 p-4 text-left transition hover:-translate-y-0.5 hover:border-chili-500 hover:bg-chili-100/70"
+          >
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-chili-500 shadow-sm"><Calculator size={20} /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-bold text-charcoal-900">{t('calculator.home_entry')}</span>
+              <span className="block text-xs text-charcoal-500">{t('calculator.home_entry_desc')}</span>
+            </span>
+            <ChevronRight size={18} className="text-chili-500" />
+          </button>
         </section>
       </div>
     </main>
